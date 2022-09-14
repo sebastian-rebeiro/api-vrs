@@ -14,13 +14,13 @@ struct params {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(non_camel_case_types)]
-struct param {
+pub struct param {
     value: value,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(non_camel_case_types)]
-struct value {
+pub struct value {
     #[serde(rename = "struct")]
     structure: structure,
 }
