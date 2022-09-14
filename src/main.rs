@@ -4,7 +4,6 @@
 extern crate rocket;
 
 mod xml;
-use serde_xml_rs::from_str;
 
 const URI: &str = "http://billing.dido.ca:8008";
 
@@ -19,7 +18,7 @@ async fn simple_post(url: &str, body: String) -> String {
         .await
         .expect("error reading");
 
-    let Request = request
+    let request = request
         .replace("<methodResponse>", "")
         .replace("</methodResponse>", "")
         .replace("<params>", "")
@@ -29,7 +28,7 @@ async fn simple_post(url: &str, body: String) -> String {
         .replace("<struct>", "")
         .replace("</struct>", "");
 
-    let deserialized: xml::value = from_str(&Request).unwrap();
+    let deserialized: xml::member = serde_xml_rs::from_str(&request).unwrap();
     serde_json::to_string(&deserialized).unwrap()
 }
 
@@ -40,7 +39,7 @@ fn index() -> &'static str {
 
 #[get("/client/<clientnum>")]
 async fn customer_info(clientnum: u32) -> String {
-    let front: String = String::from("<methodCall><methodName>FS.API.customer_info</methodName><params><param><value><string>secret</string></value></param><param><value><string>7739f6396a8942d5a2b5e0eabd7700b207e374a5cb08337cdd2590606aa0ca13</string></value></param><param><value><string>custnum</string></value></param><param><value><string>");
+    let front: String = String::from("<methodCall><methodName>FS.API.customer_info</methodName><params><param><value><string>secret</string></value></param><param><value><string></string></value></param><param><value><string>custnum</string></value></param><param><value><string>");
     let back: String = String::from("</string></value></param></params></methodCall>");
 
     let post: String = format!("{front}{clientnum}{back}");

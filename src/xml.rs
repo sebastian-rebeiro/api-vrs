@@ -33,7 +33,7 @@ struct structure {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(non_camel_case_types)]
-struct member {
+pub struct member {
     name: String,
     value: valuef,
 }
