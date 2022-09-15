@@ -10,7 +10,7 @@ const URI: &str = "http://billing.dido.ca:8008";
 
 async fn simple_post(url: &str, body: String) -> String {
     let request: String = reqwest::Client::new() // Making new request "client"
-        .post(url) // Always a post method to XML-RPC server
+        .post(url) //
         .body(body)
         .send() // Sending
         .await
@@ -33,17 +33,54 @@ async fn simple_post(url: &str, body: String) -> String {
     serde_json::to_string(&deserialized).unwrap()
 }
 
+#[derive(Debug)]
+#[allow(non_camel_case_types)]
+enum Methods {
+    customer_info,
+}
+
+#[derive(Debug)]
+struct Params {
+    name: String,
+    value: String,
+}
+
+fn outgoing_body(method_name: Methods, params: Vec<Params>) -> String {
+    let mut outgoing = String::new();
+
+    for param in params {
+        let x = format!("<param><value><string>{}</string></value></param><param><value><string>{}</string></value></param>", param.name, param.value);
+        outgoing = [outgoing, x].join("");
+    }
+
+    format!(
+        "<methodCall><methodName>FS.API.{:?}</methodName><params>{}</params></methodCall>",
+        method_name, outgoing
+    )
+}
+
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[get("/client/<clientnum>")]
+#[get("/client/<clientnum>", format = "application/json")]
 async fn customer_info(clientnum: u32) -> content::RawJson<String> {
-    let front: String = String::from("<methodCall><methodName>FS.API.customer_info</methodName><params><param><value><string>secret</string></value></param><param><value><string></string></value></param><param><value><string>custnum</string></value></param><param><value><string>");
-    let back: String = String::from("</string></value></param></params></methodCall>");
-
-    let post: String = format!("{front}{clientnum}{back}");
+    // request.headers();
+    let post: String = outgoing_body(
+        Methods::customer_info,
+        vec![
+            Params {
+                name: String::from("secret"),
+                value: String::from(""),
+            },
+            Params {
+                name: String::from("custnum"),
+                value: clientnum.to_string(),
+            },
+        ],
+    );
+    // let post: String = format!("<methodCall><methodName>FS.API.customer_info</methodName><params><param><value><string>secret</string></value></param><param><value><string>{}</string></value></param><param><value><string>custnum</string></value></param><param><value><string>{}</string></value></param></params></methodCall>", "", clientnum);
 
     content::RawJson(simple_post(&URI, post).await)
 }
