@@ -27,7 +27,7 @@ pub struct value {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(non_camel_case_types)]
-struct structure {
+pub struct structure {
     member: Vec<member>,
 }
 
