@@ -8,7 +8,7 @@ use rocket::response::content;
 
 const URI: &str = "http://billing.dido.ca:8008";
 
-async fn simple_post(url: &str, body: String) -> content::RawJson<String> {
+async fn simple_post(url: &str, body: String) -> String {
     let request: String = reqwest::Client::new() // Making new request "client"
         .post(url) // Always a post method to XML-RPC server
         .body(body)
@@ -30,7 +30,7 @@ async fn simple_post(url: &str, body: String) -> content::RawJson<String> {
         .replace("</struct>", "");
 
     let deserialized: xml::structure = serde_xml_rs::from_str(&request).unwrap();
-    content::RawJson(serde_json::to_string(&deserialized).unwrap())
+    serde_json::to_string(&deserialized).unwrap()
 }
 
 #[get("/")]
@@ -45,7 +45,7 @@ async fn customer_info(clientnum: u32) -> content::RawJson<String> {
 
     let post: String = format!("{front}{clientnum}{back}");
 
-    simple_post(&URI, post).await
+    content::RawJson(simple_post(&URI, post).await)
 }
 
 #[launch]
