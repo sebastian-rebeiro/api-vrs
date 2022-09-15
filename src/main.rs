@@ -47,15 +47,55 @@ enum Methods {
 
 #[derive(Debug)]
 struct Params {
-    name: String,
+    name: Param,
     value: String,
+}
+
+#[derive(Debug)]
+#[allow(non_camel_case_types)]
+enum Param {
+    secret,
+    custnum,
+    payby,
+    paid,
+    _date,
+    amount,
+    first,
+    last,
+    ss,
+    company,
+    address1,
+    city,
+    county,
+    state,
+    zip,
+    country,
+    latitude,
+    longitude,
+    geocode,
+    censustract,
+    censusyear,
+    daytime,
+    night,
+    fax,
+    mobile,
+    invoicing_list,
+    payinfo,
+    paycvv,
+    paydate,
+    payname,
+    referral_custnum,
+    salesnum,
+    agentnum,
+    agent_custid,
+    refferal_custnum,
 }
 
 fn outgoing_body(method_name: Methods, params: Vec<Params>) -> String {
     let mut outgoing = String::new();
 
     for param in params {
-        let x = format!("<param><value><string>{}</string></value></param><param><value><string>{}</string></value></param>", param.name, param.value);
+        let x = format!("<param><value><string>{:?}</string></value></param><param><value><string>{}</string></value></param>", param.name, param.value);
         outgoing = [outgoing, x].join("");
     }
 
@@ -72,16 +112,15 @@ fn index() -> &'static str {
 
 #[get("/client/<clientnum>", format = "application/json")]
 async fn customer_info(clientnum: u32) -> content::RawJson<String> {
-    // request.headers();
     let post: String = outgoing_body(
         Methods::customer_info,
         vec![
             Params {
-                name: String::from("secret"),
+                name: Param::secret,
                 value: String::from(""),
             },
             Params {
-                name: String::from("custnum"),
+                name: Param::custnum,
                 value: clientnum.to_string(),
             },
         ],
