@@ -37,6 +37,12 @@ async fn simple_post(url: &str, body: String) -> String {
 #[allow(non_camel_case_types)]
 enum Methods {
     customer_info,
+    insert_payment,
+    insert_refund,
+    new_customer,
+    update_customer,
+    location_info,
+    bill_now,
 }
 
 #[derive(Debug)]
