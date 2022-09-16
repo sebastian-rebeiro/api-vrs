@@ -3,8 +3,10 @@
 #[macro_use]
 extern crate rocket;
 
+mod fromreq;
 mod xml;
-use rocket::response::content;
+use rocket::{response::content, serde::json::Json};
+use serde::Deserialize;
 
 const URI: &str = "http://billing.dido.ca:8008";
 
@@ -91,6 +93,39 @@ enum Param {
     refferal_custnum,
 }
 
+#[derive(Debug, Deserialize)]
+struct inp_customer {
+    first: String,
+    last: String,
+    ss: String,
+    company: String,
+    address1: String,
+    city: String,
+    county: String,
+    state: String,
+    zip: String,
+    country: String,
+    latituge: String,
+    longitude: String,
+    geocode: String,
+    censustract: String,
+    censusyear: String,
+    daytime: String,
+    night: String,
+    fax: String,
+    mobile: String,
+    invoicing_list: String,
+    payby: String,
+    payinfo: String,
+    paycvv: String,
+    paydate: String,
+    payname: String,
+    referral_custnum: String,
+    salesnum: String,
+    agentnum: String,
+    agent_custid: String,
+}
+
 fn outgoing_body(method_name: Methods, params: Vec<Params>) -> String {
     let mut outgoing = String::new();
 
@@ -130,7 +165,36 @@ async fn customer_info(clientnum: u32) -> content::RawJson<String> {
     content::RawJson(simple_post(&URI, post).await)
 }
 
+#[get("/sensitive")]
+fn sensitive(key: fromreq::ApiKey) -> String {
+    format!("this key is valid {}", key.0)
+}
+
+#[route(POST, uri = "/client", data = "<data>")]
+async fn new_customer(data: Json<String>) -> content::RawJson<String> {
+    println!("{:?}", data);
+
+    let post: String = outgoing_body(
+        Methods::customer_info,
+        vec![
+            Params {
+                name: Param::secret,
+                value: String::from(""),
+            },
+            Params {
+                name: Param::custnum,
+                value: String::from(""),
+            },
+        ],
+    );
+    content::RawJson(simple_post(&URI, post).await)
+}
+
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/api/v1/", routes![index, customer_info])
+    rocket::build().mount(
+        "/api/v1/",
+        routes![index, new_customer, customer_info, sensitive],
+    )
 }
+// https://youtu.be/2RWXeosWhAQ?t=886
