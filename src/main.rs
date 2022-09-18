@@ -146,13 +146,13 @@ fn index() -> &'static str {
 }
 
 #[get("/client/<clientnum>", format = "application/json")]
-async fn customer_info(clientnum: u32) -> content::RawJson<String> {
+async fn customer_info(clientnum: u32, apisecret: fromreq::ApiKey) -> content::RawJson<String> {
     let post: String = outgoing_body(
         Methods::customer_info,
         vec![
             Params {
                 name: Param::secret,
-                value: String::from(""),
+                value: apisecret.0,
             },
             Params {
                 name: Param::custnum,
@@ -171,7 +171,7 @@ fn sensitive(key: fromreq::ApiKey) -> String {
 }
 
 #[route(POST, uri = "/client", data = "<data>")]
-async fn new_customer(data: Json<String>) -> content::RawJson<String> {
+async fn new_customer(data: Json<String>, apisecret: fromreq::ApiKey) -> content::RawJson<String> {
     println!("{:?}", data);
 
     let post: String = outgoing_body(
@@ -179,7 +179,7 @@ async fn new_customer(data: Json<String>) -> content::RawJson<String> {
         vec![
             Params {
                 name: Param::secret,
-                value: String::from(""),
+                value: apisecret.0,
             },
             Params {
                 name: Param::custnum,

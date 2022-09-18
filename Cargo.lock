@@ -716,6 +716,7 @@ dependencies = [
 name = "moon"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "reqwest",
  "rocket",
  "serde",
