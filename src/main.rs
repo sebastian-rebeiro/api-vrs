@@ -161,7 +161,7 @@ async fn customer_info(clientnum: u32, apisecret: fromreq::ApiKey) -> content::R
     );
     // let post: String = format!("<methodCall><methodName>FS.API.customer_info</methodName><params><param><value><string>secret</string></value></param><param><value><string>{}</string></value></param><param><value><string>custnum</string></value></param><param><value><string>{}</string></value></param></params></methodCall>", "", clientnum);
 
-    content::RawJson(simple_post(&URI, post).await)
+    content::RawJson(simple_post(URI, post).await)
 }
 
 #[route(POST, uri = "/client", data = "<data>")]
@@ -296,14 +296,11 @@ async fn new_customer(
             },
         ],
     );
-    content::RawJson(simple_post(&URI, post).await)
+    content::RawJson(simple_post(URI, post).await)
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount(
-        "/api/v1/",
-        routes![index, new_customer, customer_info, sensitive],
-    )
+    rocket::build().mount("/api/v1/", routes![index, new_customer, customer_info])
 }
 // https://youtu.be/2RWXeosWhAQ?t=886

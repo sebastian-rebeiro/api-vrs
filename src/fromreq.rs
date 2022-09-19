@@ -1,6 +1,5 @@
 // Taken from https://github.com/rstropek/RustyRockets/blob/master/src/api_key.rs
 
-use base64;
 use rocket::{http::Status, request, request::FromRequest, request::Outcome, Request};
 use std::str;
 
